@@ -10,6 +10,7 @@ dependencies = [
     "ipykernel>=7.2.0",
     "langchain-google-genai>=4.2.1",
     "langchain-openai>=1.1.12",
+    "matplotlib>=3.10.8",
     "mteb>=1.12.5",
     "numpy==1.26.4",
     "pandas>=2.3.3",
