@@ -1,43 +1,53 @@
 # Word2Vec Assignment Summary
 
-## What Was Changed
-- Added more training text by using the Flipkart review corpus, splitting reviews into sentences, and also including the extra `data/story*.txt` files.
-- Trained Word2Vec for more epochs and compared multiple parameter settings instead of one fixed configuration.
-- Evaluated the learned embeddings using a downstream sentiment classifier built on average review embeddings.
+## Aim
+The goal of this assignment was to improve the Word2Vec model by:
+- adding more data
+- training for more epochs
+- checking accuracy
+- testing different embedding dimensions
+- trying different parameters
+
+## What I Did
+I used the `flipkart_reviews.csv` dataset.
+
+To add more data, I:
+- used all review texts
+- split reviews into smaller sentences
+- also used the story files inside the `data` folder
+
+Then I trained Word2Vec with different values of:
+- embedding dimension: 50, 100, 150, 200, 300
+- epochs: 10, 20, 30, 40, 50
+- window size: 5, 8, 10
+- model type: CBOW and Skip-gram
+
+After that, I checked the accuracy using a simple sentiment classification model.
 
 ## Best Result
-- Accuracy: 0.8710
-- Corpus: reviews_plus_sentences
-- Embedding dimension: 300
-- Window size: 10
-- Epochs: 50
-- Architecture: skipgram
-- Vocabulary size: 463
+- Accuracy: `87.10%`
+- Embedding dimension: `300`
+- Epochs: `50`
+- Window size: `10`
+- Model type: `Skip-gram`
 
-## Top 5 Experiments
-```text
-                             corpus  vector_size  window  min_count  epochs architecture  train_vocab  accuracy
-reviews_plus_sentences_plus_stories          200      10          1      40     skipgram          665    0.8710
-             reviews_plus_sentences          300      10          1      50     skipgram          463    0.8710
-reviews_plus_sentences_plus_stories          300      10          1      50     skipgram          665    0.8710
-             reviews_plus_sentences          200      10          1      40     skipgram          463    0.8387
-             reviews_plus_sentences          150       8          1      30     skipgram          463    0.7419
-```
+## Simple Observations
+- Small dimensions like 50 and 100 gave low accuracy.
+- Increasing the embedding dimension improved the result.
+- Training for more epochs also improved the model.
+- Skip-gram performed better than CBOW.
 
-## Best Model Classification Report
-```text
-precision    recall  f1-score   support
+## Final Conclusion
+The model improved when I:
+- added more data
+- increased the number of epochs
+- used a larger embedding dimension
 
-    negative     0.9231    0.8000    0.8571        15
-    positive     0.8333    0.9375    0.8824        16
+Best parameters:
+- `vector_size = 300`
+- `epochs = 50`
+- `window = 10`
+- `sg = 1` which means Skip-gram
 
-    accuracy                         0.8710        31
-   macro avg     0.8782    0.8688    0.8697        31
-weighted avg     0.8768    0.8710    0.8702        31
-```
-
-## Conclusion
-- Small CBOW models underfit this dataset and stayed near chance level.
-- Increasing epochs and embedding dimensions improved performance.
-- Skip-gram with a larger window performed much better than the smaller baselines.
-- The best setup reached about 87.1% accuracy, which is strong for a small dataset and simple average-embedding pipeline.
+Final accuracy:
+- `87.10%`

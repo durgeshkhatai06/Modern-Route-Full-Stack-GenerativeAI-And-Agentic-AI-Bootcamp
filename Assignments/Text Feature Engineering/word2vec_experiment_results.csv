@@ -1,0 +1,16 @@
+corpus,vector_size,window,min_count,epochs,architecture,train_vocab,accuracy
+reviews_plus_sentences_plus_stories,200,10,1,40,skipgram,665,0.871
+reviews_plus_sentences,300,10,1,50,skipgram,463,0.871
+reviews_plus_sentences_plus_stories,300,10,1,50,skipgram,665,0.871
+reviews_plus_sentences,200,10,1,40,skipgram,463,0.8387
+reviews_plus_sentences,150,8,1,30,skipgram,463,0.7419
+reviews_plus_sentences_plus_stories,150,8,1,30,skipgram,665,0.7419
+reviews_only,200,10,1,40,skipgram,463,0.7419
+reviews_only,300,10,1,50,skipgram,463,0.7419
+reviews_only,50,5,1,10,cbow,463,0.5161
+reviews_plus_sentences,50,5,1,10,cbow,463,0.5161
+reviews_plus_sentences_plus_stories,50,5,1,10,cbow,665,0.5161
+reviews_only,100,5,1,20,cbow,463,0.5161
+reviews_plus_sentences_plus_stories,100,5,1,20,cbow,665,0.5161
+reviews_only,150,8,1,30,skipgram,463,0.5161
+reviews_plus_sentences,100,5,1,20,cbow,463,0.4839
