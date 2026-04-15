@@ -12,6 +12,7 @@ dependencies = [
     "langchain-openai>=1.1.12",
     "matplotlib>=3.10.8",
     "mteb>=1.12.5",
+    "nltk>=3.9.1",
     "numpy==1.26.4",
     "pandas>=2.3.3",
     "pillow>=10.2.0",
