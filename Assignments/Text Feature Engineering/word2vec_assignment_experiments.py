@@ -123,6 +123,7 @@ def run_experiments() -> tuple[pd.DataFrame, dict[str, object]]:
                         predictions,
                         target_names=["negative", "positive"],
                         digits=4,
+                        zero_division=0,
                     ),
                 }
 
