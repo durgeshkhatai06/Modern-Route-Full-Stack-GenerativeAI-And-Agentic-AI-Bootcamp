@@ -26,3 +26,12 @@ inspection_task = Task(
     expected_output="A detailed report highlighting any issues found",
     agent=expert_analyst
 )
+
+# Create and run the crew
+crew = Crew(
+    agents=[expert_analyst],
+    tasks=[inspection_task]
+)
+
+result = crew.kickoff()
+print(result)
