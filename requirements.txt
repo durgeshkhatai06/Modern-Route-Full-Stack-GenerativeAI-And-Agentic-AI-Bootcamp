@@ -21,3 +21,8 @@ langchain-openai
 pandas
 matplotlib
 litellm
+mem0ai
+langchain-google-genai
+jupyter
+google-generativeai
+docling
