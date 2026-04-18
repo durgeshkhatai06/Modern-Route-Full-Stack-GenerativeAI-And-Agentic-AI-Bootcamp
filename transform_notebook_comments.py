@@ -4,7 +4,7 @@ import re
 
 
 NOTEBOOK_PATH = pathlib.Path(
-    r"F:\Modern-Route-Full-Stack-GenerativeAI-And-Agentic-AI-Bootcamp\Assignments\Text Feature Engineering\Text_Feature_Engineering.ipynb"
+    r"F:\Modern-Route-Full-Stack-GenerativeAI-And-Agentic-AI-Bootcamp\crewai\Crewai with OPIK Integration.ipynb"
 )
 
 
