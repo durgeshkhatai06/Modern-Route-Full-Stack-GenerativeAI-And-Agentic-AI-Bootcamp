@@ -47,7 +47,7 @@ with st.sidebar:
 
 def generate_content(topic):
     llm = LLM(
-        model="gemini/gemini-2.5-flash",
+        model="groq/llama-3.1-8b-instant",
     )
 
     search_tool = SerperDevTool(n_results=1)  # search_tool = SerperDevTool(n=2)
