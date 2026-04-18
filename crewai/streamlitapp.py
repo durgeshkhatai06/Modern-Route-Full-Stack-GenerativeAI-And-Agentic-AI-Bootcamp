@@ -16,13 +16,40 @@ os.environ.setdefault(
 
 load_dotenv()
 
+CHAT_SAFE_MODELS = [
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+    "openai/gpt-oss-20b",
+]
+
+NON_CHAT_MODEL_KEYWORDS = (
+    "whisper",
+    "tts",
+    "speech",
+    "transcribe",
+    "transcription",
+    "audio",
+)
+
+
+def validate_chat_model(model_name: str) -> str:
+    normalized = model_name.strip()
+    if not normalized:
+        raise ValueError("Please choose a chat model.")
+    if any(keyword in normalized.lower() for keyword in NON_CHAT_MODEL_KEYWORDS):
+        raise ValueError(
+            f"`{normalized}` is not a chat model. Choose a text model like "
+            "`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, or `openai/gpt-oss-20b`."
+        )
+    return normalized
+
 
 def build_crew(topic: str, groq_api_key: str, serper_api_key: str) -> Crew:
     os.environ["GROQ_API_KEY"] = groq_api_key
     os.environ["SERPER_API_KEY"] = serper_api_key
 
     llm = LLM(
-        model=os.environ.get("CREWAI_MODEL", "llama-3.3-70b-versatile"),
+        model=validate_chat_model(os.environ.get("CREWAI_MODEL", "llama-3.3-70b-versatile")),
         api_key=os.environ["GROQ_API_KEY"],
         base_url=os.environ.get("GROQ_BASE_URL", "https://api.groq.com/openai/v1"),
         temperature=float(os.environ.get("CREWAI_TEMPERATURE", "0.1")),
@@ -154,9 +181,15 @@ with st.sidebar:
         value=os.environ.get("SERPER_API_KEY", ""),
         type="password",
     )
+    preset_model = st.selectbox(
+        "Recommended chat models",
+        options=CHAT_SAFE_MODELS,
+        index=0,
+    )
     model_name = st.text_input(
         "Model",
-        value=os.environ.get("CREWAI_MODEL", "llama-3.3-70b-versatile"),
+        value=os.environ.get("CREWAI_MODEL", preset_model),
+        help="Use a text/chat model only. Audio models like whisper are not supported here.",
     )
     max_tokens = st.number_input(
         "Max tokens per model call",
@@ -165,7 +198,7 @@ with st.sidebar:
         value=int(os.environ.get("CREWAI_MAX_TOKENS", "500")),
         step=50,
     )
-    os.environ["CREWAI_MODEL"] = model_name
+    os.environ["CREWAI_MODEL"] = model_name.strip() or preset_model
     os.environ["CREWAI_MAX_TOKENS"] = str(max_tokens)
 
 topic = st.text_input("Topic", value="AI in Healthcare")
@@ -180,6 +213,7 @@ if st.button("Generate Blog Post", type="primary"):
     else:
         try:
             with st.spinner("CrewAI is researching and writing..."):
+                validate_chat_model(os.environ["CREWAI_MODEL"])
                 crew = build_crew(topic, groq_api_key, serper_api_key)
                 result = kickoff_with_retry(crew, {"topic": topic})
 

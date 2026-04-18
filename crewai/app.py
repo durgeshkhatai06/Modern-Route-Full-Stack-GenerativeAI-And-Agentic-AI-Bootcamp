@@ -13,12 +13,12 @@ from dotenv import load_dotenv  # Imports dotenv support so values from a .env f
 load_dotenv()  # Loads environment variables from a .env file into this process if the file exists.
 
 # Set your Serper key here if you don't want to use a .env file.
-os.environ.setdefault("SERPER_API_KEY", "your_serper_api_key_here")  # Sets a fallback Serper API key when one is not already present.
+os.environ.setdefault("SERPER_API_KEY", "ac2494103b33b9d58b7680bbda48830d0d225656")  # Sets a fallback Serper API key when one is not already present.
 
 topic = "AI in Healthcare"  # Defines the topic that the research and writing workflow will focus on.
 
 llm = LLM(  # Creates the language model configuration that both agents will share.
-    model=os.environ.get("CREWAI_MODEL", "llama-3.3-70b-versatile"),  # Uses CREWAI_MODEL if provided, otherwise defaults to a Groq model name.
+    model=os.environ.get("CREWAI_MODEL", "whisper-large-v3"),  # Uses CREWAI_MODEL if provided, otherwise defaults to a Groq model name.
     api_key=os.environ.get("GROQ_API_KEY"),  # Reads the Groq API key from the environment for authentication.
     base_url=os.environ.get("GROQ_BASE_URL", "https://api.groq.com/openai/v1"),  # Uses Groq's OpenAI-compatible endpoint unless a custom one is provided.
     temperature=float(os.environ.get("CREWAI_TEMPERATURE", "0.1")),  # Uses a very low temperature to keep outputs focused and reduce unnecessary token usage.
