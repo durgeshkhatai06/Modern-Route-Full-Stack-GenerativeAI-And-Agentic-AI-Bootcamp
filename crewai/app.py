@@ -1,4 +1,6 @@
 import os  # Imports Python's built-in os module so we can read and set environment variables.
+import re  # Imports regular expressions so we can read retry timing from rate-limit messages.
+import time  # Imports time so we can pause briefly before retrying a rate-limited request.
 from pathlib import Path  # Imports Path so we can build filesystem paths in a clean cross-platform way.
 
 # Keep CrewAI's local storage inside the repo so the script doesn't depend on writable AppData permissions.
@@ -19,10 +21,12 @@ llm = LLM(  # Creates the language model configuration that both agents will sha
     model=os.environ.get("CREWAI_MODEL", "llama-3.3-70b-versatile"),  # Uses CREWAI_MODEL if provided, otherwise defaults to a Groq model name.
     api_key=os.environ.get("GROQ_API_KEY"),  # Reads the Groq API key from the environment for authentication.
     base_url=os.environ.get("GROQ_BASE_URL", "https://api.groq.com/openai/v1"),  # Uses Groq's OpenAI-compatible endpoint unless a custom one is provided.
+    temperature=float(os.environ.get("CREWAI_TEMPERATURE", "0.1")),  # Uses a very low temperature to keep outputs focused and reduce unnecessary token usage.
+    max_tokens=int(os.environ.get("CREWAI_MAX_TOKENS", "500")),  # Caps each response more aggressively so the crew stays under Groq's token-per-minute limit more easily.
 )  # Finishes the shared LLM configuration.
 
 # Tool
-search_tool = SerperDevTool(n=2)  # Creates a search tool that returns up to 2 search results per query.
+search_tool = SerperDevTool(n=1)  # Creates a search tool that returns fewer search results to reduce context size and token usage.
 
 # Agent 1 - Research Agent
 senior_research_analyst = Agent(  # Creates the first agent responsible for research and fact gathering.
@@ -65,22 +69,23 @@ research_tasks = Task(  # Creates the first task that asks the research agent to
     description=(  # Starts the detailed instructions for the research task.
         """
             1. Conduct comprehensive research on {topic} including:
-                - Recent developments and news
-                - Key industry trends and innovations
-                - Expert opinions and analyses
-                - Statistical data and market insights
+                - 2 recent developments or news items
+                - 2 key industry trends or innovations
+                - 1 expert opinion or analysis
+                - 1 relevant fact or statistic
             2. Evaluate source credibility and fact-check all information
-            3. Organize findings into a structured research brief
+            3. Organize findings into a concise structured research brief
             4. Include all relevant citations and sources
+            5. Keep the total response under 250 words
         """
     ),  # Ends the multi-line task description.
-    expected_output="""A detailed research report containing:
+    expected_output="""A concise research report containing:
             - Executive summary of key findings
             - Comprehensive analysis of current trends and developments
             - List of verified facts and statistics
             - All citations and links to original sources
             - Clear categorization of main themes and patterns
-            Please format with clear sections and bullet points for easy reference.""",  # Defines what a successful research output should look like.
+            Please format with clear sections and bullet points for easy reference and keep it under 250 words.""",  # Defines what a successful research output should look like.
     agent=senior_research_analyst,  # Assigns this task to the research agent.
 )  # Finishes the research task definition.
 
@@ -98,6 +103,7 @@ writing_task = Task(  # Creates the second task that asks the writer to turn res
                 - Compelling conclusion
             4. Preserves all source citations in [Source: URL] format
             5. Includes a References section at the end
+            6. Keep the total blog post under 400 words
         """
     ),  # Ends the multi-line writing task description.
     expected_output="""A polished blog post in markdown format that:
@@ -105,7 +111,8 @@ writing_task = Task(  # Creates the second task that asks the writer to turn res
             - Contains properly structured sections
             - Includes Inline citations hyperlinked to the original source url
             - Presents information in an accessible yet informative way
-            - Follows proper markdown formatting, use H1 for the title and H3 for the sub-sections""",  # Describes the required format and quality of the final article.
+            - Follows proper markdown formatting, use H1 for the title and H3 for the sub-sections
+            - Stays under 400 words""",  # Describes the required format and quality of the final article.
     agent=content_writer,  # Assigns this task to the content writer agent.
 )  # Finishes the writing task definition.
 
@@ -115,6 +122,22 @@ crew = Crew(  # Creates the CrewAI workflow that combines both agents and both t
     verbose=True,  # Enables detailed execution logs for the whole crew.
 )  # Finishes the crew definition.
 
-result = crew.kickoff(inputs={"topic": topic})  # Starts the crew and passes the selected topic into the workflow.
+
+def kickoff_with_retry(active_crew: Crew, inputs: dict, retries: int = 3):  # Defines a helper that retries a few times after a rate-limit wait.
+    for attempt in range(retries + 1):  # Loops through the initial attempt plus any allowed retries.
+        try:  # Starts a protected block so CrewAI errors can be handled safely.
+            return active_crew.kickoff(inputs=inputs)  # Runs the crew and returns the result on success.
+        except Exception as exc:  # Handles any exception raised while the crew is running.
+            error_text = str(exc)  # Converts the exception to text so we can inspect the message.
+            wait_match = re.search(r"try again in ([0-9.]+)s", error_text, re.IGNORECASE)  # Looks for Groq's suggested retry delay.
+            if "rate limit" in error_text.lower() and wait_match and attempt < retries:  # Checks whether this is a retryable rate-limit error.
+                wait_seconds = float(wait_match.group(1)) + 1.0  # Adds a small buffer to the suggested wait time.
+                print(f"Rate limit hit. Waiting {wait_seconds:.1f} seconds before retrying...")  # Tells the user what the script is doing.
+                time.sleep(wait_seconds)  # Pauses before retrying so the next request is more likely to succeed.
+                continue  # Tries the request again after the wait.
+            raise  # Re-raises non-retryable errors or failures after the final attempt.
+
+
+result = kickoff_with_retry(crew, {"topic": topic})  # Starts the crew with a one-time retry for rate-limit errors.
 
 print(result)  # Prints the final combined result to the terminal.
