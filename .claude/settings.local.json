@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -c ':*)"
+      "Bash(python -c ':*)",
+      "Bash(where python *)",
+      "Bash(where jupyter *)",
+      "Bash(\"J:\\\\Anaconda\\\\python.exe\" -c \"import jq; print\\(jq.__file__\\)\")",
+      "Bash(\"J:\\\\Anaconda\\\\python.exe\" -m pip install jq)",
+      "Bash(\"J:\\\\Anaconda\\\\python.exe\" -c \"import jq; print\\('ok', jq.__file__\\)\")"
     ]
   }
 }
