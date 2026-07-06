@@ -27,3 +27,4 @@ jupyter
 google-generativeai
 docling
 jq
+unstructured
