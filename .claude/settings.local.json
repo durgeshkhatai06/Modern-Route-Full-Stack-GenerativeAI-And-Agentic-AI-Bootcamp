@@ -34,7 +34,8 @@
       "Bash(\"/j/Anaconda/python.exe\" -c \"import psutil; print\\(psutil.__version__\\); print\\(psutil.__file__\\)\")",
       "Bash(rm -rf \"/j/Anaconda/Lib/site-packages/psutil\" \"/j/Anaconda/Lib/site-packages/psutil-5.9.0.dist-info\" \"/j/Anaconda/Lib/site-packages/psutil-7.2.2.dist-info\")",
       "Bash(echo \"cleanup exit: $?\")",
-      "Bash(\"/j/Anaconda/python.exe\" -m pip install \"psutil>=7.2.2,<8.0.0\")"
+      "Bash(\"/j/Anaconda/python.exe\" -m pip install \"psutil>=7.2.2,<8.0.0\")",
+      "Bash(\"/j/Anaconda/python.exe\" -m pip install docx2txt)"
     ]
   }
 }
