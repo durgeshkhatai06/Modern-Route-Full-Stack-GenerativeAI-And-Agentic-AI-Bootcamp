@@ -23,3 +23,6 @@ t2.start()
 ### Wait for the threads to complete
 t1.join()
 t2.join()
+
+finished_time=time.time()-t
+print(f"Finished in {finished_time} seconds")
