@@ -8,7 +8,7 @@ app=Flask(__name__)
 
 @app.route("/")
 def welcome():
-    return "Welcome to this best Flask course.This should be an amazing course"
+    return "Welcome34 to this best Flask course.This should be an amazing course"
 
 @app.route("/index")
 def index():
