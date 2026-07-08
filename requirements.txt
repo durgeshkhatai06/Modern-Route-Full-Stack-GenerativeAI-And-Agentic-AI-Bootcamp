@@ -29,3 +29,6 @@ docling
 jq
 unstructured
 bs4
+ipykernel
+seaborn
+flask
